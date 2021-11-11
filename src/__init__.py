@@ -14,7 +14,7 @@ def create_app(test_config=None):
     if test_config is None:
         app.config.from_mapping(
             SECRET_KEY=os.environ.get("SECRET_KEY"),
-            JWT_SECRETKEY=os.environ.get("JWT_SECRET_KEY"),
+            JWT_SECRET_KEY=os.environ.get("JWT_SECRET_KEY"),
 
             SWAGGER={
                 'title': 'Song Searching API',
