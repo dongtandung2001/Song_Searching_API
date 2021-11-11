@@ -4,7 +4,6 @@ click==8.0.3
 decorator==5.1.0
 flasgger==0.9.5
 Flask==2.0.2
-Flask-JWT==0.3.2
 Flask-JWT-Extended==4.3.1
 importlib-resources==5.4.0
 itsdangerous==2.0.1
