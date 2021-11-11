@@ -1,0 +1,28 @@
+User log in
+---
+tags:
+  - Authentication
+parameters:
+  - name: body
+    description: The body should contain the user login info (email and password)
+    in: body
+    required: true
+    schema:
+      type: object
+      required:
+        - "email"
+        - "password"
+      properties:
+        email:
+          type: "email"
+          example: "user@gmail.com"
+        password:
+          type: "string"
+          format: password
+          example: "********"
+responses:
+  200:
+    description: Successfully log in
+
+  401:
+    description: Fail to login due to wrong email/password given

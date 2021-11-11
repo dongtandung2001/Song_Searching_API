@@ -4,7 +4,7 @@ Search songs contains desired keywords from users
 
 #…or create a new repository on the command line
 
-echo "# Song-Searching-API" >> README.md
+echo "# Song_Searching_API" >> README.md
 
 git init
 
@@ -14,13 +14,13 @@ git commit -m "first commit"
 
 git branch -M main
 
-git remote add origin https://github.com/dongtandung2001/Song-Searching-API.git
+git remote add origin https://github.com/dongtandung2001/Song_Searching_API.git
 
 git push -u origin main
 
 #…or push an existing repository from the command line
 
-git remote add origin https://github.com/dongtandung2001/Song-Searching-API.git
+git remote add origin https://github.com/dongtandung2001/Song_Searching_API.git
 
 git branch -M main
 

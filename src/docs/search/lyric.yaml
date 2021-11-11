@@ -1,0 +1,20 @@
+Searching artists using name's keyword
+---
+tags:
+  - Search
+parameters:
+  - in: path
+    name: artist
+    description: keyword(s), separated by comma
+    required: true
+  - in: path
+    name: type
+    description: i = inclusive searching, e = exclusive searching
+    required: true
+
+responses:
+  200:
+    description: Songs found
+
+  404:
+    description: No Result
