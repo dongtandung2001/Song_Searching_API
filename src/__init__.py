@@ -31,11 +31,11 @@ def create_app(test_config=None):
     Swagger(app, config=swagger_config, template=template)
 
     @app.errorhandler(HTTP_404_NOT_FOUND)
-    def error_404(e):
-        return jsonify({'Error:' 'Not Found'}), HTTP_404_NOT_FOUND
+    def handle_404(e):
+        return jsonify({'error': 'Not found'}), HTTP_404_NOT_FOUND
 
     @app.errorhandler(HTTP_500_INTERNAL_SERVER_ERROR)
-    def error_500(e):
-        return jsonify({'Error:' 'Something\'s gone wrong, We will fix it as soon as possible'}), HTTP_500_INTERNAL_SERVER_ERROR
+    def handle_500(e):
+        return jsonify({'error': 'Something went wrong, we are working on it'}), HTTP_500_INTERNAL_SERVER_ERROR
 
     return app
