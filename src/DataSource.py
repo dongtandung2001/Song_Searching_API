@@ -1,28 +1,32 @@
 import sqlite3
 from datetime import datetime
+import os
+import psycopg2
 
 
 class DataSource:
     def __init__(self):
         # create connection and cursor
-        self._db = sqlite3.connect('src/Music.db')
+        DATABASE_URL = os.environ.get('DATABASE_URL')
+        self._db = psycopg2.connect(DATABASE_URL, database='d6al40t7nhrpei', user='dpczvuzpznqxln', password='fd34aced965ce0525f4072a8589e1607f53358f066b772ed8facbcaa66095565',
+                                    host='ec2-18-211-41-246.compute-1.amazonaws.com', port='5432')
         self._cursor = None
 
     def open(self):
         try:
             self._cursor = self._db.cursor()
             print('Successfully connect to the database')
-        except sqlite3.Error as e:
+        except psycopg2.Error as e:
             print('Cannot connect to the database' + e)
 
     def close(self):
         try:
             self._cursor.close()
-        except sqlite3.Error as e:
+        except psycopg2.Error as e:
             print('Cannot close the database ' + e)
         try:
             self._db.close()
-        except sqlite3.Error as e1:
+        except psycopg2.Error as e1:
             print('Cannot clos the cursor ' + e1)
 
     def query_song_by_lyrics(self, lyrics, searching_type):
@@ -36,12 +40,12 @@ class DataSource:
             a = "%" + lyric.lower().capitalize() + " %"
             b = "% " + lyric.lower() + " %"
 
-            self._cursor.execute("PRAGMA CASE_SENSITIVE_LIKE = 1;")
+            #self._cursor.execute("PRAGMA CASE_SENSITIVE_LIKE = 1;")
             query_command = """
             SELECT 
                 *
-            FROM lyrics 
-            WHERE Lyric LIKE ? OR Lyric LIKE ?"""
+            FROM public.lyrics 
+            WHERE "Lyric" LIKE %s OR "Lyric" LIKE %s"""
 
             par_ = (a, b)
             self._cursor.execute(query_command, par_)
@@ -106,8 +110,8 @@ class DataSource:
         SELECT 
             *
         FROM 
-            artists 
-        WHERE artists.Link = (?)
+            public.artists 
+        WHERE "Link" = %s
         """
         par_ = (link,)
         self._cursor.execute(query_command, par_)
@@ -127,8 +131,8 @@ class DataSource:
                             SELECT 
                                 *
                             FROM 
-                                artists 
-                            WHERE Artist LIKE (?)
+                                public.artists 
+                            WHERE "Artist" LIKE %s
                             """
             par_ = (a,)
             self._cursor.execute(query_command, par_)
@@ -183,8 +187,8 @@ class DataSource:
                 SELECT 
                     *
                 FROM 
-                    lyrics 
-                WHERE ALink = (?)
+                    public.lyrics 
+                WHERE "ALink" = %s
                 """
         par_ = (link,)
         self._cursor.execute(query_command, par_)
@@ -205,12 +209,12 @@ class DataSource:
             a = "%" + title.lower().capitalize() + " %"
             b = "% " + title.lower().capitalize() + " %"
 
-            self._cursor.execute("PRAGMA CASE_SENSITIVE_LIKE = 1;")
+            #self._cursor.execute("PRAGMA CASE_SENSITIVE_LIKE = 1;")
             query_command = """
                     SELECT 
                         *
-                    FROM lyrics 
-                    WHERE SName LIKE ? OR Sname LIKE ?"""
+                    FROM public.lyrics 
+                    WHERE "SName" LIKE %s OR "Sname" LIKE %s"""
 
             par_ = (a, b)
             self._cursor.execute(query_command, par_)
@@ -274,28 +278,37 @@ class DataSource:
 class User:
     def __init__(self):
         # create connection and cursor
-        self._db = sqlite3.connect('src/user.db')
+        DATABASE_URL = os.environ.get('DATABASE_URL')
+        self._db = psycopg2.connect(DATABASE_URL, database='d6al40t7nhrpei', user='dpczvuzpznqxln', password='fd34aced965ce0525f4072a8589e1607f53358f066b772ed8facbcaa66095565',
+                                    host='ec2-18-211-41-246.compute-1.amazonaws.com', port='5432')
+        #self._db = sqlite3.connect('src/user.db')
         self._cursor = None
 
     def open(self):
         try:
             self._cursor = self._db.cursor()
             print('Successfully connect to the database')
-        except sqlite3.Error as e:
+        except psycopg2.Error as e:
             print('Cannot connect to the database' + e)
 
     def close(self):
         try:
             self._cursor.close()
-        except sqlite3.Error as e:
+        except psycopg2.Error as e:
             print('Cannot close the database ' + e)
         try:
             self._db.close()
-        except sqlite3.Error as e1:
+        except psycopg2.Error as e1:
             print('Cannot clos the cursor ' + e1)
 
     def query_email(self, email):
-        query_command = "SELECT email FROM users WHERE email = (?)"
+        query_command = """
+        SELECT 
+            "email" 
+        FROM 
+            public.user
+        WHERE "email" = %s
+        """
         par_ = (email,)
         self._cursor.execute(query_command, par_)
         result = self._cursor.fetchall()
@@ -305,7 +318,13 @@ class User:
             return None
 
     def query_username(self, username):
-        query_command = "SELECT username FROM users WHERE username = (?)"
+        query_command = """
+        SELECT 
+            username 
+        FROM 
+            public.user
+        WHERE "username" = %s
+        """
         par_ = (username,)
         self._cursor.execute(query_command, par_)
         result = self._cursor.fetchall()
@@ -315,7 +334,13 @@ class User:
             return None
 
     def query_password(self, email):
-        query_command = "SELECT password FROM users WHERE email = (?)"
+        query_command = """
+        SELECT 
+            password 
+        FROM 
+            public.user 
+        WHERE "email" = %s
+        """
         par_ = (email,)
         self._cursor.execute(query_command, par_)
         result = self._cursor.fetchall()
@@ -323,10 +348,17 @@ class User:
 
     def create_user(self, **kwargs):
         query_command = '''
-        INSERT INTO users(username, email, password, create_at, updated_at)
-        VALUES (?,?,?,?,?)
+        SELECT COUNT(*) FROM public.user
         '''
-        par_ = (kwargs['username'], kwargs['email'],
+        self._cursor.execute(query_command)
+        id = self._cursor.fetchall()
+        id = id[0][0]
+        id = id + 1
+        query_command = '''
+        INSERT INTO public.user(id,username, email, password, create_at, updated_at)
+        VALUES (%s,%s,%s,%s,%s,%s)
+        '''
+        par_ = (id, kwargs['username'], kwargs['email'],
                 kwargs['password'], datetime.now().strftime("%d/%m/%Y %H:%M:%S"), datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
 
         self._cursor.execute(query_command, par_)
@@ -336,8 +368,8 @@ class User:
     def query_id(self, email):
         query_command = '''
             SELECT id
-            FROM users
-            WHERE email = (?)
+            FROM public.user
+            WHERE "email" = %s
         '''
         par_ = (email,)
         self._cursor.execute(query_command, par_)
@@ -347,8 +379,8 @@ class User:
     def query_username_by_id(self, id):
         query_command = '''
             SELECT username
-            FROM users
-            WHERE id = (?)
+            FROM public.user
+            WHERE "id" = %s
         '''
         par_ = (id,)
         self._cursor.execute(query_command, par_)
@@ -358,8 +390,8 @@ class User:
     def query_user_by_id(self, id):
         query_command = '''
             SELECT * 
-            FROM users
-            WHERE id = (?)
+            FROM public.user
+            WHERE "id" = %s
         '''
         par_ = (id,)
         self._cursor.execute(query_command, par_)
