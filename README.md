@@ -5,7 +5,9 @@ Project
 Song Searching API
 Oct 2021 – Nov 2021
 
-Project descriptionIt was inspired by my final project of Data Structure class at De Anza College about finding songs that contain a keyword that we desire. However, the database is kinda small ( < 50 songs).
+Project description
+
+It was inspired by my final project of Data Structure class at De Anza College about finding songs that contain a keyword that we desire. However, the database is kinda small ( < 50 songs).
 
 Thus, I enhanced it to an API to query songs, artists that contain multiple keywords that we desire with a much larger database (~200k songs, and 3000 artists). It was successfully deployed on Heroku, however, due to the limit of PostgreSQL add-on, I was only given 10,000 rows for free, and my database is more than 200k rows, so I shut down the server.
 
